@@ -35,15 +35,25 @@ for(wbname in wbnames){
 	wsnames <- getSheets(wbo)
 	# i <- which(wsnames=="Energy") # next one, used to restart if crash
 	# wsnames <- wsnames[i:length(wsnames)]
-	wsname <- wsnames[1]
+	wsname <- wsnames[2]
 	for (wsname in wsnames){
 		print(paste("Adding worksheet", wsname))
 		stopifnot(str_detect(wsname, mysep)==FALSE)
-		value <- readWorksheet(wbo, wsname, header=FALSE, colTypes="character") # do strings lose accuracy?
+		value <- readWorksheet(object=wbo,
+							   sheet=wsname,
+							   header=FALSE,
+							   colTypes="character",
+							   startRow=1,
+							   startCol=1,
+							   useCachedValues=TRUE, # avoids external reference errors
+							   autofitRow=FALSE,
+							   autofitCol=FALSE
+		)
 		names(value) <- codes[1:ncol(value)]
 		formula <- value
 		if (ncol(value)>0 && nrow(value)>0){
 			for (col in 1:ncol(value)){
+				formula[,col] <- NA_character_
 				for (row in 1:nrow(value)){
 					if (!is.na(value[row,col])){
 						# read formula

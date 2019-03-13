@@ -24,19 +24,19 @@ for(wbname in wbnames){
 	print(paste("Adding workbook", wbname))
 	stopifnot(str_detect(wbname, mysep)==FALSE)
 	# loop through workbookfiles=worksheets
-	wbfiles <- str_match(temp_files, paste0(wbname, mysep, ".+rds")) # could fail if special characters?
-	wbfiles <- wbfiles[!is.na(wbfiles)]
-	wbdata <- setNames(vector("list", length(wbfiles)), wbfiles)
-	wbfile <- wbfiles[1]
-	for (wbfile in wbfiles){
-		wsname <- str_match(wbfile, paste0("(?<=", wbname, mysep, ").+(?=.rds)"))[1]
+	wsfiles <- str_match(temp_files, paste0(wbname, mysep, ".+rds")) # could fail if special characters?
+	wsfiles <- wsfiles[!is.na(wsfiles)]
+	wbdata <- setNames(vector("list", length(wsfiles)), wsfiles)
+	wsfile <- wsfiles[1]
+	for (wsfile in wsfiles){
+		wsname <- str_match(wsfile, paste0("(?<=", wbname, mysep, ").+(?=.rds)"))[1]
 		print(paste("Adding worksheet", wsname))
 		stopifnot(str_detect(wsname, mysep)==FALSE)
-		temp <- readRDS(paste0("temp/", wbfile))
+		temp <- readRDS(paste0("temp/", wsfile))
 		# loop through worksheet columns
 		n <- ncol(temp$value)
 		if (n>0){
-			wsdata <- vector("list", n)
+			wsdata <- vector("list", n) # list of columns
 			i <- 1
 			for (i in 1:n){
 				wsdata[[i]] <- tibble(
@@ -54,16 +54,16 @@ for(wbname in wbnames){
 				# look for repeated formulas
 				# other matrix analysis before it gets collapsed
 			} # next col
-			wbdata[[wbfile]] <- bind_rows(wsdata)
+			wbdata[[wsfile]] <- bind_rows(wsdata)
 		}
-	} # next wbfile
+	} # next wsfile
 	data[[wbname]] <- bind_rows(wbdata)
 } # next file/sheet
 data <- bind_rows(data) %>%
 	mutate(
 		wbname=as.factor(wbname),
 		wsname=as.factor(wsname),
-		formula=if_else(formula==value, NA_character_, formula)
+		formula=str_replace(formula, "^\\+", "") # strip leading +
 		)
 
 # write_csv(select(data, -wbname), "data.csv")

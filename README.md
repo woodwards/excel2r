@@ -1,6 +1,8 @@
 # excel2r
 
-### Convert Excel models to R using R scripts in RStudio
+### Convert Excel models to R
 
-* see project_guide.txt
-* see outstanding_issues.txt
+Values and formulas are imported using the XLConnect package, which requires Java. 
+
+* see project_guide.txt (tba)
+* see outstanding_issues.txt (tba)

@@ -47,7 +47,7 @@ find_inputs <- function(type, form){
 }
 
 # avoid as.numeric coercion warnings
-as_numeric <- function(x, default=555){
+as_numeric <- function(x, default=NA_real_){
 	suppressWarnings(if_else(is.na(as.numeric(x)), default, as.numeric(x)))
 }
 
