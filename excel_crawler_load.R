@@ -4,32 +4,33 @@
 # load libraries
 library(tidyverse)
 
-# load functions
-source("excel_crawler_functions.R")
-
 # my separator (must be legal but not found in any wbname or wsname)
 mysep <- "@@@@"
 
+# make column codes vector
+col <- 1:1000 # or as wide as necessary, max is 16384
+codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
+
 # workbooks to read
 wbnames <- c("Simplified forecaster.xlsx")
-# wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
+wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
 
 #  initialise overarching dataframe
 data <- setNames(vector("list", length(wbnames)), wbnames)
 temp_files <- list.files(path="temp", pattern="*.rds")
 
 # loop through workbooks
-wbname <- wbnames[1]
+wbname <- wbnames[1] # for testing
 for(wbname in wbnames){
 	print(paste("Adding workbook", wbname))
 	stopifnot(str_detect(wbname, mysep)==FALSE)
 	# loop through workbookfiles=worksheets
-	wsfiles <- str_match(temp_files, paste0(wbname, mysep, ".+rds")) # could fail if special characters?
+	wsfiles <- str_match(temp_files, str_c("\\Q", wbname, mysep, "\\E.+rds")) # \\Q and \\E bracket fixed portion of pattern
 	wsfiles <- wsfiles[!is.na(wsfiles)]
 	wbdata <- setNames(vector("list", length(wsfiles)), wsfiles)
 	wsfile <- wsfiles[1]
 	for (wsfile in wsfiles){
-		wsname <- str_match(wsfile, paste0("(?<=", wbname, mysep, ").+(?=.rds)"))[1]
+		wsname <- str_match(wsfile, str_c("(?<=\\Q", wbname, mysep, "\\E).+(?=.rds)"))[1]
 		print(paste("Adding worksheet", wsname))
 		stopifnot(str_detect(wsname, mysep)==FALSE)
 		temp <- readRDS(paste0("temp/", wsfile))
@@ -41,7 +42,9 @@ for(wbname in wbnames){
 			for (i in 1:n){
 				wsdata[[i]] <- tibble(
 					wbname=temp$wbname,
-				  	wsname=temp$wsname,
+					wbnum=temp$wbnum,
+					wsname=temp$wsname,
+					wsnum=temp$wsnum,
 					code=codes[i],
 					col=i,
 					row=1:nrow(temp$value),
@@ -60,10 +63,10 @@ for(wbname in wbnames){
 	data[[wbname]] <- bind_rows(wbdata)
 } # next file/sheet
 data <- bind_rows(data) %>%
+	arrange(wbnum, wsnum, row) %>%
 	mutate(
-		wbname=as.factor(wbname),
-		wsname=as.factor(wsname),
-		formula=str_replace(formula, "^\\+", "") # strip leading +
+		wbname=factor(wbname, levels=unique(wbname)), # retain ordering
+		wsname=factor(wsname, levels=unique(wsname)) # retain ordering
 		)
 
 # write_csv(select(data, -wbname), "data.csv")

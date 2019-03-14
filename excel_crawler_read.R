@@ -16,26 +16,26 @@ if (.Machine$sizeof.pointer==4){
 library(tidyverse)
 library(XLConnect)
 
-# load functions
-source("excel_crawler_functions.R")
+# make column codes vector
+col <- 1:1000 # or as wide as necessary, max is 16384
+codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
 
 # my separator (must be legal but not found in any wbname or wsname)
 mysep <- "@@@@"
 
 # workbooks to read
-wbnames <- c("Simplified forecaster.xlsx")
-# wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
+wbnames <- c("Simplified forecaster.xlsx", "Copy of NBO 2019 _Final_withGHG.xlsx")
 
 # add workbook
-wbname <- wbnames[1]
+wbname <- wbnames[1] # for testing
 for(wbname in wbnames){
 	print(paste("Adding workbook", wbname))
 	stopifnot(str_detect(wbname, mysep)==FALSE)
 	wbo <- loadWorkbook(wbname, create=FALSE) # connection to workbook object
 	wsnames <- getSheets(wbo)
-	# i <- which(wsnames=="Energy") # next one, used to restart if crash
-	# wsnames <- wsnames[i:length(wsnames)]
-	wsname <- wsnames[2]
+	# use this to resume after crash
+	# wsnames <- wsnames[which(wsnames=="Chart1"):length(wsnames)]
+	wsname <- wsnames[2] # for testing
 	for (wsname in wsnames){
 		print(paste("Adding worksheet", wsname))
 		stopifnot(str_detect(wsname, mysep)==FALSE)
@@ -49,9 +49,9 @@ for(wbname in wbnames){
 							   autofitRow=FALSE,
 							   autofitCol=FALSE
 		)
-		names(value) <- codes[1:ncol(value)]
-		formula <- value
 		if (ncol(value)>0 && nrow(value)>0){
+			names(value) <- codes[1:ncol(value)]
+			formula <- value
 			for (col in 1:ncol(value)){
 				formula[,col] <- NA_character_
 				for (row in 1:nrow(value)){
@@ -64,9 +64,14 @@ for(wbname in wbnames){
 					}
 				}
 			}
+		} else {
+			formula <- value
 		}
+		wbnum <- which(wbnames==wbname)
+		wsnum <- which(wsnames==wsname)
 		fname <- paste0("temp/", wbname, mysep, wsname, ".rds")
-		saveRDS(list(wbname=wbname, wsname=wsname, value=value, formula=formula),
+		saveRDS(list(wbname=wbname, wbnum=wbnum, wsname=wsname, wsnum=wsnum,
+					 value=value, formula=formula),
 				fname)
 		xlcFreeMemory() # maybe this will help with memory
 	}
