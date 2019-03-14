@@ -3,6 +3,7 @@
 
 # workbooks to read
 wbnames <- c("Simplified forecaster.xlsx")
+# wbnames <- c("FD1004 Data For Modelling.xlsx")
 # wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
 
 # read excel and save to rds
