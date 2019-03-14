@@ -16,15 +16,16 @@ if (.Machine$sizeof.pointer==4){
 library(tidyverse)
 library(XLConnect)
 
+# workbooks to read
+# wbnames <- c("Simplified forecaster.xlsx")
+# wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
+
 # make column codes vector
 col <- 1:1000 # or as wide as necessary, max is 16384
 codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
 
 # my separator (must be legal but not found in any wbname or wsname)
 mysep <- "@@@@"
-
-# workbooks to read
-wbnames <- c("Simplified forecaster.xlsx", "Copy of NBO 2019 _Final_withGHG.xlsx")
 
 # add workbook
 wbname <- wbnames[1] # for testing

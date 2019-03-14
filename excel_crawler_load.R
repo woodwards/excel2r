@@ -4,16 +4,16 @@
 # load libraries
 library(tidyverse)
 
+# workbooks to read
+# wbnames <- c("Simplified forecaster.xlsx")
+# wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
+
 # my separator (must be legal but not found in any wbname or wsname)
 mysep <- "@@@@"
 
 # make column codes vector
 col <- 1:1000 # or as wide as necessary, max is 16384
 codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
-
-# workbooks to read
-wbnames <- c("Simplified forecaster.xlsx")
-wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
 
 #  initialise overarching dataframe
 data <- setNames(vector("list", length(wbnames)), wbnames)

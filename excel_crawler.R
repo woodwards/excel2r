@@ -1,11 +1,9 @@
 # analyse workbook data
 # Simon Woodward, DairyNZ 2019
 
-# load libraries
-library(tidyverse)
-
 # workbooks to read
-wbnames <- c("Simplified forecaster.xlsx", "Copy of NBO 2019 _Final_withGHG.xlsx")
+wbnames <- c("Simplified forecaster.xlsx")
+# wbnames <- c("Copy of NBO 2019 _Final_withGHG.xlsx")
 
 # read excel and save to rds
 source("excel_crawler_read.R")
