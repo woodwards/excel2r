@@ -12,8 +12,9 @@ library(tidyverse)
 mysep <- "@@@@"
 
 # make column codes vector
-col <- 1:1000 # or as wide as necessary, max is 16384
-codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
+xlcol <- 1:10000 # or as wide as necessary, max is 16384
+xlcode <- if_else(xlcol<=26L, LETTERS[xlcol], paste0(LETTERS[pmax(1, (xlcol-1L) %/% 26L)], LETTERS[(xlcol-1L) %% 26L + 1L]))
+names(xlcol) <- xlcode
 
 #  initialise overarching dataframe
 data <- setNames(vector("list", length(wbnames)), wbnames)
@@ -45,7 +46,7 @@ for(wbname in wbnames){
 					wbnum=temp$wbnum,
 					wsname=temp$wsname,
 					wsnum=temp$wsnum,
-					code=codes[i],
+					code=xlcode[i],
 					col=i,
 					row=1:nrow(temp$value),
 					value=temp$value[,i],
@@ -68,5 +69,6 @@ data <- bind_rows(data) %>%
 		wbname=factor(wbname, levels=unique(wbname)), # retain ordering
 		wsname=factor(wsname, levels=unique(wsname)) # retain ordering
 		)
+rm(list=c("wsdata", "wbdata", "temp"))
 
 # write_csv(select(data, -wbname), "data.csv")

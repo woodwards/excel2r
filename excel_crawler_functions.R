@@ -1,9 +1,5 @@
 # excel crawler functions
 
-# make column codes vector
-col <- 1:16384
-codes <- if_else(col<=26L, LETTERS[col], paste0(LETTERS[pmax(1, (col-1L) %/% 26L)], LETTERS[(col-1L) %% 26L + 1L]))
-
 # nmake excel address e.g. A3
 make_address <- function(row, col){
 	paste0(ifelse(col<=26, LETTERS[col],paste0(LETTERS[col %/% 26],LETTERS[col %% 26])), row)
