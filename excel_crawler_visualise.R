@@ -170,9 +170,33 @@ p <- ggplot() +
 	scale_fill_viridis() +
 	facet_wrap( ~ wsname, scales="free")
 print(p)
-fname <- paste0("facetplot_", str_replace_all(data$wbname[1], " |\\.", "_"), ".png")
+fname <- paste0(str_replace_all(data$wbname[1], " |\\.", "_"), "_formulaplot.png")
 png(fname, width=297*1.3, heigh=210, units="mm", res=300)
 print(p)
 dev.off()
 
+# numerical value plot
+p <- ggplot() +
+	labs(title=data$wbname[1], fill="Scaled Value") +
+	geom_raster(data=data,
+				mapping=aes(x=col,
+							y=row,
+							# colour=atan(value2),
+							# size=str_length(formula2),
+							fill=sign(value2)*log(abs(value2)+1)
+							# alpha=log(abs(value2)+1)
+				)
+				# ,
+				# size=0.1
+	) +
+	scale_y_reverse() +
+	# scale_colour_gradientn(colours=terrain.colors(16)) +
+	# theme_few() +
+	scale_fill_viridis() +
+	facet_wrap( ~ wsname, scales="free")
+print(p)
+fname <- paste0(str_replace_all(data$wbname[1], " |\\.", "_"), "_valueplot.png")
+png(fname, width=297*1.3, heigh=210, units="mm", res=300)
+print(p)
+dev.off()
 
