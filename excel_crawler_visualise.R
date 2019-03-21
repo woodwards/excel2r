@@ -177,13 +177,14 @@ dev.off()
 
 # numerical value plot
 p <- ggplot() +
-	labs(title=data$wbname[1], fill="Scaled Value") +
+	labs(title=data$wbname[1], fill="Value#") +
 	geom_raster(data=data,
 				mapping=aes(x=col,
 							y=row,
 							# colour=atan(value2),
 							# size=str_length(formula2),
-							fill=sign(value2)*log(abs(value2)+1)
+							# fill=log10(pmax(abs(value2), 1e-3))
+							fill=rank(value2, na.last="keep", ties.method="min")
 							# alpha=log(abs(value2)+1)
 				)
 				# ,

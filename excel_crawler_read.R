@@ -52,7 +52,7 @@ for(wbname in wbnames){
 							   autofitCol=FALSE
 		)
 		if (ncol(value)>0 && nrow(value)>0){
-			names(value) <- codes[1:ncol(value)]
+			names(value) <- xlcode[1:ncol(value)]
 			formula <- value
 			for (col in 1:ncol(value)){
 				formula[,col] <- NA_character_
