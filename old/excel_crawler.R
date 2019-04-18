@@ -15,3 +15,9 @@ source("excel_crawler_load.R")
 
 # simple parse of values and formulae and create visualisation
 source("excel_crawler_visualise.R")
+
+# find terminal regions and work backwards to inputs!
+# there is no unique sorting order
+# attempt to name regions intelligently
+# if regions reference themselves we need to split them
+# sometimes a loop or iteration may be necessary
